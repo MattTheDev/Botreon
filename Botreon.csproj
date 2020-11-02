@@ -7,12 +7,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="discord.net" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.4" />
+		<PackageReference Include="MediatR" Version="9.0.0" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.9" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.9" />
 	</ItemGroup>
 
 	<ItemGroup>
