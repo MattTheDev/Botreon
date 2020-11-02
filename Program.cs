@@ -4,6 +4,7 @@ using Botreon.Models;
 using Botreon.Services;
 using Discord.Commands;
 using Discord.WebSocket;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -56,6 +57,8 @@ namespace Botreon
 
             services.AddOptions();
             services.Configure<BotSettings>(_config);
+
+            services.AddMediatR(typeof(Program));
 
             return services.BuildServiceProvider();
         }
