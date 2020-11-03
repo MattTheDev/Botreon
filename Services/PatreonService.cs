@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Botreon.Exceptions;
 using Botreon.Handlers;
 using Botreon.Models;
 using Botreon.Models.Patreon;
