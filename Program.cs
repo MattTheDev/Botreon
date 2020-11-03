@@ -37,7 +37,8 @@ namespace Botreon
 
             serviceProvider.GetRequiredService<CommandService>();
             serviceProvider.GetRequiredService<CommandHandlerService>();
-
+            serviceProvider.GetRequiredService<PatreonService>().Init();
+            
             await Task.Delay(-1);
         }
 
@@ -47,13 +48,14 @@ namespace Botreon
                 .AddSingleton(new DiscordSocketClient(
                     new DiscordSocketConfig
                     {
-                        LogLevel = Discord.LogSeverity.Verbose
+                        LogLevel = Discord.LogSeverity.Info
                     }
                 ))
                 .AddSingleton<CommandHandlerService>()
-                .AddSingleton<StartupService>()
+                .AddSingleton<CommandService>()
                 .AddSingleton<LoggingService>()
-                .AddSingleton<CommandService>();
+                .AddSingleton<PatreonService>()
+                .AddSingleton<StartupService>();
 
             services.AddOptions();
             services.Configure<BotSettings>(_config);

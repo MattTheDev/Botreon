@@ -1,7 +1,24 @@
 {
   "Prefix": "&",
+  "PatreonCampaignId": 0,
+  "DiscordGuildId": 0,
   "Tokens": {
     "Discord": "REPLACE_WITH_YOUR_TOKEN",
     "Patreon": "REPLACE_WITH_YOUR_TOKEN"
-  }
+  },
+  "Timers": {
+    "RoleReconcilier": 60000
+  },
+  "TierRoles": [
+    {
+      "TierName": "REPLACE_WITH_YOUR_TIER_NAME_1",
+      "TierId": 0,
+      "RoleId": 0
+    },
+    {
+      "TierName": "REPLACE_WITH_YOUR_TIER_NAME_2",
+      "TierId": 0,
+      "RoleId": 0
+    }
+  ]
 }

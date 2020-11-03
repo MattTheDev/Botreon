@@ -37,7 +37,10 @@ namespace Botreon.Handlers
             while (loopDeDoop)
             {
                 var url =
-                    $"https://www.patreon.com/api/oauth2/v2/campaigns/{_botSettings.PatreonCampaignId}/members?include=currently_entitled_tiers,user&fields%5Bmember%5D=patron_status,last_charge_status&fields%5Buser%5D=social_connections,email,first_name,last_name";
+                    $"https://www.patreon.com/api/oauth2/v2/campaigns/{_botSettings.PatreonCampaignId}/members?" +
+                    $"include=currently_entitled_tiers,user&" +
+                    $"fields%5Bmember%5D=patron_status,last_charge_status&" +
+                    $"fields%5Buser%5D=social_connections,email,first_name,last_name";
 
                 if (!string.IsNullOrEmpty(nextPage))
                 {
