@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Botreon.Exceptions;
 using Botreon.Handlers;
 using Botreon.Models;
 using Botreon.Models.Patreon;
@@ -17,15 +18,18 @@ namespace Botreon.Services
     {
         private readonly BotSettings _botSettings;
         private readonly DiscordSocketClient _discordSocketClient;
+        private readonly LoggingService _loggingService;
         private readonly IMediator _mediator;
 
         public PatreonService(
             IOptions<BotSettings> botSettings,
             DiscordSocketClient discordSocketClient,
+            LoggingService loggingService,
             IMediator mediator)
         {
             _botSettings = botSettings.Value;
             _discordSocketClient = discordSocketClient;
+            _loggingService = loggingService;
             _mediator = mediator;
         }
 
@@ -35,14 +39,20 @@ namespace Botreon.Services
         {
             _roleReconciliationTimer = new Timer(async (e) =>
             {
+                await _loggingService.LogAsync("Getting Active Patrons.");
                 var patrons = await GetActivePatrons();
 
+                await _loggingService.LogAsync("Processing Roles - Assigning.");
                 await AssignRoles(patrons);
+
+                await _loggingService.LogAsync("Processing Roles - Removing.");
                 await RemoveRoles(patrons);
+
+                await _loggingService.LogAsync("Finished Processing Patrons.");
             }, null, 0, _botSettings.Timers.RoleReconcilier);
         }
 
-        public async Task AssignRoles(List<Patron> patrons)
+        private async Task AssignRoles(List<Patron> patrons)
         {
             var guild = _discordSocketClient?.GetGuild(_botSettings.DiscordGuildId);
 
@@ -60,16 +70,24 @@ namespace Botreon.Services
                     var role = listOfRoles.FirstOrDefault(x => x.Id == patron.TierRole.RoleId);
                     var discordUser = guild.GetUser(ulong.Parse(patron.DiscordId));
 
-                    if (discordUser != null &&
-                            !discordUser.Roles.Contains(role))
+                    try
                     {
-                        await discordUser.AddRoleAsync(role);
+                        if (discordUser != null &&
+                            !discordUser.Roles.Contains(role))
+                        {
+                            await discordUser.AddRoleAsync(role);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        await _loggingService.LogException($"Unable to Add {role.Name} to {discordUser.Nickname ?? discordUser.Username}. Confirm the bot has Manage Role Access " +
+                            $"and that the Bot's role is above the roles you are trying to manage. ({ex.Message})");
                     }
                 }
             }
         }
 
-        public async Task RemoveRoles(List<Patron> patrons)
+        private async Task RemoveRoles(List<Patron> patrons)
         {
             var guild = _discordSocketClient?.GetGuild(_botSettings.DiscordGuildId);
 
@@ -84,30 +102,46 @@ namespace Botreon.Services
 
             foreach (var patron in patronRoleUsers)
             {
-                var isPatron = patrons.Where(x => !string.IsNullOrEmpty(x.DiscordId))
-                    .FirstOrDefault(x => x.DiscordId.Equals(patron.Id.ToString()));
-
-                if (isPatron == null)
+                try
                 {
-                    await patron.RemoveRolesAsync(listOfRoles);
+                    var isPatron = patrons.Where(x => !string.IsNullOrEmpty(x.DiscordId))
+                        .FirstOrDefault(x => x.DiscordId.Equals(patron.Id.ToString()));
 
-                    continue;
+                    if (isPatron == null)
+                    {
+                        await patron.RemoveRolesAsync(listOfRoles);
+
+                        continue;
+                    }
+
+                    var tierRoles = patron.Roles.Intersect(listOfRoles).ToList();
+
+                    if (tierRoles.Count > 1)
+                    {
+                        await patron.RemoveRolesAsync(tierRoles.Where(x => x.Id != isPatron.TierRole.RoleId));
+                    }
                 }
-
-                var tierRoles = patron.Roles.Intersect(listOfRoles).ToList();
-
-                if (tierRoles.Count > 1)
+                catch(Exception ex)
                 {
-                    await patron.RemoveRolesAsync(tierRoles.Where(x => x.Id != isPatron.TierRole.RoleId));
+                    await _loggingService.LogException($"Unable to remove roles from {patron.Nickname ?? patron.Username}. Confirm the bot has Manage Role Access " +
+                        $"and that the Bot's role is above the roles you are trying to manage. ({ex.Message})");
                 }
             }
         }
 
-        public async Task<List<Patron>> GetActivePatrons()
+        private async Task<List<Patron>> GetActivePatrons()
         {
             var listOfPatrons = new List<Patron>();
 
             var response = await _mediator.Send(new PatreonRequest());
+
+            if(response.Data == null || 
+                response.Included == null || 
+                response.Meta == null)
+            {
+                return listOfPatrons;
+            }
+
             var paidPatrons = GetPaidPatrons(response);
 
             if (paidPatrons == null)
@@ -165,7 +199,7 @@ namespace Botreon.Services
             return parsedList.ToList();
         }
 
-        public TierRole GetTier(CampaignMemberData data)
+        private TierRole GetTier(CampaignMemberData data)
         {
             if (data.Relationships.CurrentlyEntitledTiers.Data != null &&
             data.Relationships.CurrentlyEntitledTiers.Data.Count > 0)

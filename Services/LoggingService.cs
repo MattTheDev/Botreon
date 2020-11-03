@@ -18,9 +18,26 @@ namespace Botreon.Services
 
         private async Task OnLogAsync(LogMessage message)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             var logText = $"[{DateTime.UtcNow:MM/dd/yyyy hh:mm:ss}] {message}";
 
             await Console.Out.WriteLineAsync(logText);
+        }
+
+        public Task LogAsync(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            var logText = $"[{DateTime.UtcNow:MM/dd/yyyy hh:mm:ss}] {message}";
+
+            return Console.Out.WriteLineAsync(logText);
+        }
+
+        public Task LogException(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            var logText = $"**EXCEPTION** [{DateTime.UtcNow:MM/dd/yyyy hh:mm:ss}] {message}";
+
+            return Console.Out.WriteLineAsync(logText);
         }
     }
 }

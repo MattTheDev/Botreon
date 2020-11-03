@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Botreon.Models;
 using Botreon.Models.Patreon;
+using Botreon.Services;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -17,10 +18,14 @@ namespace Botreon.Handlers
     public class PatreonHandler : IRequestHandler<PatreonRequest, CampaignMemberResponse>
     {
         private readonly BotSettings _botSettings;
+        private readonly LoggingService _loggingService;
 
-        public PatreonHandler(IOptions<BotSettings> botSettings)
+        public PatreonHandler(
+            IOptions<BotSettings> botSettings,
+            LoggingService loggingService)
         {
             _botSettings = botSettings.Value;
+            _loggingService = loggingService;
         }
 
         public async Task<CampaignMemberResponse> Handle(PatreonRequest request, CancellationToken cancellationToken)
@@ -73,10 +78,9 @@ namespace Botreon.Handlers
                         nextPage = responseData.Meta.Pagination.Cursors.Next;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // TODO MS better logging
-                    // do nothing, probably an error getting data from Patreon :(
+                    await _loggingService.LogException($"Unable to get patron list from the Patreon API. See the issue here: {ex.Message}");
                 }
             }
 
