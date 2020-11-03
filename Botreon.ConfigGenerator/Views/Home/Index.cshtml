@@ -1,0 +1,34 @@
+﻿@using Newtonsoft.Json;
+@using static Botreon.ConfigGenerator.Models.PatreonCampaignTierQueryResponse;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    var campaignId = User.Claims.FirstOrDefault(x => x.Type.Equals("CampaignId"));
+    var tierList = JsonConvert.DeserializeObject<List<IncludedTier>>(User.Claims.FirstOrDefault(x => x.Type.Equals("Tiers")).Value);
+
+
+    <div>
+        <h6>Campaign Data</h6>
+        <span>Campaign Id: </span>
+        <span>@campaignId.Value</span>
+    </div>
+
+    <div>
+        <h6>Tier Data</h6>
+        @foreach (var tier in tierList)
+        {
+            <div>
+                <span>@tier.Attributes.Title</span>
+                <span>@tier.Id</span>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <a class="nav-link text-dark" asp-action="Login" asp-controller="Account">Login with Patreon to Generate Configuration</a>
+}
