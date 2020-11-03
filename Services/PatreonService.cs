@@ -53,19 +53,15 @@ namespace Botreon.Services
 
             var listOfRoles = _botSettings.TierRoles.Select(x => guild.GetRole(x.RoleId));
 
-            foreach (var patron in patrons)
+            foreach (var patron in patrons.Where(x => !string.IsNullOrWhiteSpace(x.DiscordId)))
             {
                 if (!string.IsNullOrEmpty(patron.DiscordId))
                 {
                     var role = listOfRoles.FirstOrDefault(x => x.Id == patron.TierRole.RoleId);
                     var discordUser = guild.GetUser(ulong.Parse(patron.DiscordId));
 
-                    if (discordUser == null)
-                    {
-                        continue;
-                    }
-
-                    if (!discordUser.Roles.Contains(role))
+                    if (discordUser != null &&
+                            !discordUser.Roles.Contains(role))
                     {
                         await discordUser.AddRoleAsync(role);
                     }
@@ -91,7 +87,7 @@ namespace Botreon.Services
                 var isPatron = patrons.Where(x => !string.IsNullOrEmpty(x.DiscordId))
                     .FirstOrDefault(x => x.DiscordId.Equals(patron.Id.ToString()));
 
-                if(isPatron == null)
+                if (isPatron == null)
                 {
                     await patron.RemoveRolesAsync(listOfRoles);
 
@@ -100,12 +96,12 @@ namespace Botreon.Services
 
                 var tierRoles = patron.Roles.Intersect(listOfRoles).ToList();
 
-                if(tierRoles.Count > 1)
+                if (tierRoles.Count > 1)
                 {
-                    await patron.RemoveRolesAsync(tierRoles.Where(x => x.Id == isPatron.TierRole.RoleId));
+                    await patron.RemoveRolesAsync(tierRoles.Where(x => x.Id != isPatron.TierRole.RoleId));
                 }
             }
-        }        
+        }
 
         public async Task<List<Patron>> GetActivePatrons()
         {
@@ -123,7 +119,7 @@ namespace Botreon.Services
             {
                 var tierRole = GetTier(data);
 
-                if(tierRole == null)
+                if (tierRole == null)
                 {
                     continue;
                 }
@@ -174,9 +170,9 @@ namespace Botreon.Services
             if (data.Relationships.CurrentlyEntitledTiers.Data != null &&
             data.Relationships.CurrentlyEntitledTiers.Data.Count > 0)
             {
-                foreach(var tierRole in _botSettings.TierRoles)
+                foreach (var tierRole in _botSettings.TierRoles)
                 {
-                    if(data.Relationships.CurrentlyEntitledTiers.Data.Any(x => int.Parse(x.Id) == tierRole.TierId))
+                    if (data.Relationships.CurrentlyEntitledTiers.Data.Any(x => int.Parse(x.Id) == tierRole.TierId))
                     {
                         return tierRole;
                     }
