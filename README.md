@@ -2,6 +2,11 @@
   <img src="https://discordapp.com/api/guilds/767835739177091083/widget.png?style=shield" alt="Discord Server">
 </a>
 
+<a href="https://paypal.me/dawgeth">
+  <img height="32" src="https://github.com/everdrone/coolbadge/raw/master/badges/Paypal/Beer/Dark/Short.png" />
+</a>
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E2JLQE)
 ![.NET Core](https://github.com/MattTheDev/Botreon/workflows/.NET%20Core/badge.svg)
 
 # Botreon
@@ -48,6 +53,7 @@
 
 ## Putting it all together
 
+```
 {
   "Prefix": "&", <-- Put anything you want here
   "PatreonCampaignId": 0, <-- 
@@ -75,7 +81,8 @@
     }
   ]
 }
+```
 
 ## Have Any Questions?
 
-  Open an issue, or join us on our (Discord)[https://discord.gg/4PpDrCX] for this and more projects.
+  Open an issue, or join us on our [Discord](https://discord.gg/4PpDrCX) for this and more projects.
