@@ -28,10 +28,11 @@ namespace Botreon
             serviceProvider.GetRequiredService<LoggingService>();
             await serviceProvider.GetRequiredService<StartupService>().StartAsync();
             _discord = serviceProvider.GetRequiredService<DiscordSocketClient>();
+            var loggingService = serviceProvider.GetRequiredService<LoggingService>();
 
             while (_discord.CurrentUser == null)
             {
-                Console.WriteLine("Checking if service is started / completely logged in.");
+                await loggingService.LogAsync("Checking if service is started / completely logged in.");
                 System.Threading.Thread.Sleep(5000);
             }
 
